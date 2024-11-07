@@ -132,8 +132,8 @@ const WorldMap = ({ nodes }) => {
         });
         const rect = containerRef.current.getBoundingClientRect();
         setTooltipPosition({
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top,
+          x: event.clientX - 100,
+          y: event.clientY + 20,
         });
         d3.select(event.currentTarget)
           .attr("fill", "#60a5fa")

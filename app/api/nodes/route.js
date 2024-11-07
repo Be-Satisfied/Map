@@ -1,12 +1,5 @@
-import Image from "next/image";
-import WorldMap from "../components/WorldMap";
-
-export default function Home() {
-  // return <h2>Hello World</h2>;
-  const width = 800;
-  const height = 450;
-
-  // Example node count data
+export async function GET() {
+  // This is your example data - you can replace it with a database call
   const nodes = {
     China: 156,
     "United States": 203,
@@ -40,12 +33,5 @@ export default function Home() {
     Vietnam: 8,
   };
 
-  return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-2xl font-bold mb-4 text-center mt-10">
-        World Map - Node Distribution
-      </h1>
-      <WorldMap width={890} height={500} nodes={nodes} />
-    </div>
-  );
+  return Response.json(nodes);
 }

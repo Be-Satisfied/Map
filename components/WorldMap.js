@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
-import worldData from "world-atlas/countries-110m.json";
+import worldData from "world-atlas/countries-50m.json";
 import { feature } from "topojson-client";
 
 const COUNTRY_NAME_MAPPING = {
@@ -131,9 +131,11 @@ const WorldMap = ({ nodes }) => {
           nodes: nodeCount,
         });
         const rect = containerRef.current.getBoundingClientRect();
+        console.log(event.clientX, event.clientY);
+
         setTooltipPosition({
-          x: event.clientX - 100,
-          y: event.clientY + 20,
+          x: event.clientX - rect.left + 10, // 相对于容器的x坐标
+          y: event.clientY - rect.top - 10, // 相对于容器的y坐标
         });
         d3.select(event.currentTarget)
           .attr("fill", "#60a5fa")
@@ -215,8 +217,8 @@ const WorldMap = ({ nodes }) => {
                 className="absolute bg-white border border-gray-100 rounded-lg p-3 shadow-xl pointer-events-none z-10"
                 style={{
                   left: `${tooltipPosition.x}px`,
-                  top: `${tooltipPosition.y - 60}px`,
-                  transform: "translate(-50%, -100%)",
+                  top: `${tooltipPosition.y}px`,
+                  transform: "translate(-50%, -80%)",
                 }}
               >
                 <p className="text-sm font-medium text-gray-800">

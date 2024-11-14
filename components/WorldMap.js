@@ -68,34 +68,18 @@ const WorldMap = ({ nodes }) => {
     // Calculate dimensions based on container size
     const containerRect = containerRef.current.getBoundingClientRect();
     const containerWidth = containerRect.width;
-    const containerHeight = isMobile ? 300 : 500; // Fixed height based on device
+    const containerHeight = isMobile ? 300 : 500;
 
     // Update SVG dimensions
     svg.attr("width", containerWidth).attr("height", containerHeight);
 
     const g = svg.append("g");
 
-    // Adjust zoom settings
-    const zoom = d3
-      .zoom()
-      .scaleExtent([0.8, 8])
-      .translateExtent([
-        [-containerWidth * 0.2, -containerHeight * 0.2],
-        [containerWidth * 1.2, containerHeight * 1.2],
-      ])
-      .on("zoom", (event) => {
-        g.attr("transform", event.transform);
-      });
-
-    svg.call(zoom);
-
-    // 根据设备类型调整投影
+    // 修改投影设置
     const projection = d3
-      .geoEqualEarth()
-      .fitSize(
-        [containerWidth, containerHeight],
-        feature(worldData, worldData.objects.countries)
-      );
+      .geoEquirectangular()
+      .scale(containerWidth / (2 * Math.PI))
+      .translate([containerWidth / 2, containerHeight / 2]);
 
     const path = d3.geoPath().projection(projection);
 
@@ -114,12 +98,11 @@ const WorldMap = ({ nodes }) => {
       .attr("fill", (d) => {
         const countryName = d.properties.name;
         const normalizedName = COUNTRY_NAME_MAPPING[countryName] || countryName;
-        return nodes[normalizedName] ? "#dbeafe" : "#e5e7eb";
+        return nodes[normalizedName] ? "#dbeafe" : "#ffffff";
       })
       .attr("stroke", "#cbd5e1")
       .attr("stroke-width", "0.5")
       .style("cursor", "pointer")
-      .style("transition", "all 0.3s ease")
       .on("mousemove", (event, d) => {
         const countryName = d.properties.name;
         const nodeCount = normalizedNodes[countryName] || 0;
@@ -131,11 +114,9 @@ const WorldMap = ({ nodes }) => {
           nodes: nodeCount,
         });
         const rect = containerRef.current.getBoundingClientRect();
-        console.log(event.clientX, event.clientY);
-
         setTooltipPosition({
-          x: event.clientX - rect.left + 10, // 相对于容器的x坐标
-          y: event.clientY - rect.top - 10, // 相对于容器的y坐标
+          x: event.clientX - rect.left + 10,
+          y: event.clientY - rect.top - 10,
         });
         d3.select(event.currentTarget)
           .attr("fill", "#60a5fa")
@@ -145,50 +126,11 @@ const WorldMap = ({ nodes }) => {
       .on("mouseout", (event, d) => {
         const countryName = d.properties.name;
         d3.select(event.currentTarget)
-          .attr("fill", normalizedNodes[countryName] ? "#dbeafe" : "#e5e7eb")
+          .attr("fill", normalizedNodes[countryName] ? "#dbeafe" : "#ffffff")
           .attr("stroke", "#cbd5e1")
           .attr("stroke-width", "0.5");
         setHoverInfo({ country: "", nodes: 0 });
       });
-
-    // Adjust reset button position
-    const buttonSize = 32;
-    const margin = 16;
-
-    svg
-      .append("rect")
-      .attr("x", containerWidth - buttonSize - margin)
-      .attr("y", margin)
-      .attr("width", buttonSize)
-      .attr("height", buttonSize)
-      .attr("fill", "white")
-      .attr("stroke", "#cbd5e1")
-      .attr("rx", 6)
-      .style("cursor", "pointer")
-      .on("click", () => {
-        svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
-      });
-
-    svg
-      .append("text")
-      .attr("x", containerWidth - buttonSize / 2 - margin)
-      .attr("y", margin + 22)
-      .attr("text-anchor", "middle")
-      .style("font-size", "20px")
-      .text("⟲")
-      .style("cursor", "pointer")
-      .on("click", () => {
-        svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
-      });
-
-    // Adjust initial zoom based on device
-    const initialScale = isMobile ? 0.8 : 1.0;
-    const initialTransform = d3.zoomIdentity
-      .translate(containerWidth / 2, containerHeight / 2)
-      .scale(initialScale)
-      .translate(-containerWidth / 2, -containerHeight / 2);
-
-    svg.call(zoom.transform, initialTransform);
   }, [nodes, isMobile]);
 
   return (
@@ -202,7 +144,7 @@ const WorldMap = ({ nodes }) => {
           <div
             className="relative"
             style={{
-              height: isMobile ? "300px" : "500px", // Fixed height based on device
+              height: isMobile ? "300px" : "500px",
               width: "100%",
             }}
             ref={containerRef}

@@ -101,7 +101,7 @@ const WorldMap = ({ nodes }) => {
         return nodes[normalizedName] ? "#dbeafe" : "#ffffff";
       })
       .attr("stroke", "#cbd5e1")
-      .attr("stroke-width", "0.5")
+      .attr("strokeWidth", "0.5")
       .style("cursor", "pointer")
       .on("mousemove", (event, d) => {
         const countryName = d.properties.name;
@@ -121,14 +121,14 @@ const WorldMap = ({ nodes }) => {
         d3.select(event.currentTarget)
           .attr("fill", "#60a5fa")
           .attr("stroke", "#3b82f6")
-          .attr("stroke-width", "1");
+          .attr("strokeWidth", "1");
       })
       .on("mouseout", (event, d) => {
         const countryName = d.properties.name;
         d3.select(event.currentTarget)
           .attr("fill", normalizedNodes[countryName] ? "#dbeafe" : "#ffffff")
           .attr("stroke", "#cbd5e1")
-          .attr("stroke-width", "0.5");
+          .attr("strokeWidth", "0.5");
         setHoverInfo({ country: "", nodes: 0 });
       });
   }, [nodes, isMobile]);

@@ -1,0 +1,33 @@
+.node-map-container {
+  /* fill: rgba(255, 255, 255, 0.5);
+  strokeWidth: 3.105px;
+  stroke: #fff;
+  filter: drop-shadow(20.701px 31.051px 51.751px rgba(0, 0, 0, 0.05)); */
+  /* background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.6), 0 0 4px rgba(255, 255, 255, 0.4),
+    0 0 6px rgba(255, 255, 255, 0.2), 0 0 8px rgba(255, 255, 255, 0.1); */
+}
+
+.box-shadow {
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.6), 0 0 4px rgba(255, 255, 255, 0.4),
+    0 0 6px rgba(255, 255, 255, 0.2), 0 0 8px rgba(255, 255, 255, 0.1);
+}
+.box-border {
+  border: 2px solid #fff;
+}
+.node-ranking-list {
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.node-ranking-list::-webkit-scrollbar {
+  width: 6px;
+}
+.node-ranking-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.node-ranking-list::-webkit-scrollbar-thumb {
+  background-color: #495edb;
+  border-radius: 20px;
+}

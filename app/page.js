@@ -4,6 +4,7 @@ import OldWorldMap from "../components/OldWorldMap";
 import NodeRanking from "../components/NodeRanking";
 import "./css/worldmap.css";
 import WorldMap from "../components/newMap";
+import UpdateNewMap from "../components/UpdateNewMap";
 
 export default async function Home() {
   const response = await fetch("http://localhost:3000/api/nodes");
@@ -20,7 +21,7 @@ export default async function Home() {
       }}
     >
       <div className="container flex flex-col md:flex-row justify-between gap-4 mx-auto p-4 md:px-6 md:py-7 rounded-2xl node-map-container">
-        <WorldMap nodes={nodes} />
+        <UpdateNewMap nodes={nodes} />
         <NodeRanking nodes={nodes} />
       </div>
     </div>

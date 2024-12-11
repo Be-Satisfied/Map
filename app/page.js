@@ -1,14 +1,25 @@
 import Image from "next/image";
 // import WorldMap from "../components/WorldMap";
-import OldWorldMap from "../components/OldWorldMap";
+// import OldWorldMap from "../components/OldWorldMap";
 import NodeRanking from "../components/NodeRanking";
 import "./css/worldmap.css";
-import WorldMap from "../components/newMap";
+// import WorldMap from "../components/newMap";
 import UpdateNewMap from "../components/UpdateNewMap";
 
 export default async function Home() {
-  const response = await fetch("http://localhost:3000/api/nodes");
-  const { data: nodes } = await response.json();
+  let nodes = {};
+  try {
+    const response = await fetch("http://localhost:3000/api/nodes");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    nodes = data.data;
+  } catch (error) {
+    console.error("Error fetching nodes data:", error);
+    // Set default empty nodes object if fetch fails
+    nodes = {};
+  }
 
   return (
     <div

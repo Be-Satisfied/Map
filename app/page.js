@@ -9,7 +9,8 @@ import UpdateNewMap from "../components/UpdateNewMap";
 export default async function Home() {
   let nodes = {};
   try {
-    const response = await fetch("http://localhost:3000/api/nodes");
+    // 使用相对路径，这样在vercel部署时会自动使用正确的域名
+    const response = await fetch("/api/nodes");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

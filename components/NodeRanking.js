@@ -36,7 +36,7 @@ const NodeRanking = ({ nodes }) => {
 
   return (
     <div
-      className="w-2/5 h-full max-h-[543px]   p-4 rounded-[10px] flex flex-col box-shadow box-border"
+      className="w-full md:w-2/5 h-full max-h-[543px] p-4 rounded-[10px] flex flex-col box-shadow box-border"
       style={{ background: "rgba(255, 255, 255, 0.50)" }}
     >
       <h2 className="text-2xl font-semibold mb-4 border-b border-[#BABABA] pb-2 flex flex-row items-center gap-2">
@@ -124,7 +124,8 @@ const NodeRanking = ({ nodes }) => {
                     {index + 1}
                   </span>
                   <span className="font-medium text-black text-2xl">
-                    {node.name} ({node.code})
+                    {node.name}
+                    {/* ({node.code}) */}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">

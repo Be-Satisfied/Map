@@ -43,17 +43,25 @@ function WorldMap({ nodes = {} }) {
 
     let chart = root.container.children.push(
       am5map.MapChart.new(root, {
-        panX: "rotateX",
-        projection: am5map.geoMercator(),
+        // 禁用鼠标滚轮缩放
+        wheelY: "none", // 将wheelY设置为none来禁用滚轮缩放
+        // 禁用鼠标拖动
+        panX: "none",
+        panY: "none",
+        animationDuration: 1000, // 动画持续时间（毫秒）
+        interpolationDuration: 500, // 过渡动画时间
+        rotationX: -10, // X轴旋转角度
+        rotationZ: 5, // Z轴旋转角度
+        // projection: am5map.geoMercator(),
+        // projection: am5map.geoEquirectangular(),
+        // Natural Earth 1 天然地球 1
+        projection: am5map.geoNaturalEarth1(),
         layout: root.verticalLayout,
-      })
-    );
-
-    let container = chart.children.push(
-      am5.Container.new(root, {
-        layout: root.horizontalLayout,
-        width: am5.p100,
-        height: am5.p100,
+        strokeWidth: 0.1,
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
       })
     );
 
@@ -151,10 +159,10 @@ function WorldMap({ nodes = {} }) {
 
   return (
     <div
-      className="w-3/4 h-full max-h-[600px] p-4 rounded-[10px] box-shadow box-border"
+      className="w-full lg:w-4/5 h-full max-h-[600px] p-4 rounded-[10px] box-shadow box-border"
       style={{ background: "rgba(255, 255, 255, 0.50)" }}
     >
-      <h2 className="flex flex-row border-b-1 border-[#BABABA] pb-2 items-center gap-2 text-2xl font-semibold mb-4">
+      <h2 className="flex flex-row border-b border-[#BABABA] pb-2 items-center gap-2 text-2xl font-semibold mb-4">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="32"

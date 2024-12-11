@@ -4,28 +4,23 @@ import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
 import worldData from "world-atlas/countries-50m.json";
-import { getRegionByCountry, CONTINENTS } from "@/app/utis/address";
+import {
+  getRegionByCountry,
+  CONTINENTS,
+  getCountryNameByCode,
+  COUNTRY_NAME_MAPPING,
+} from "@/app/utis/address";
 import { feature } from "topojson-client";
 
-const COUNTRY_NAME_MAPPING = {
-  "United States": "United States of America",
-  USA: "United States of America",
-  UK: "United Kingdom",
-  Russia: "Russia", // Changed from "Russian Federation" to "Russia"
-  "South Korea": "Korea, Republic of",
-};
-
-const LeftWorldMap = ({ nodes = {} }) => {
+const WorldMap = ({ nodes = {} }) => {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 1000, height: 460 });
-  const [hoverInfo, setHoverInfo] = useState({ country: "", nodes: 0 });
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
-  // Normalize nodes data
+  // Normalize nodes data using getCountryNameByCode
   const normalizedNodes = Object.entries(nodes).reduce(
     (acc, [country, count]) => {
-      const normalizedCountry = COUNTRY_NAME_MAPPING[country] || country;
+      const normalizedCountry = getCountryNameByCode(country);
       acc[normalizedCountry] = count;
       return acc;
     },
@@ -57,23 +52,25 @@ const LeftWorldMap = ({ nodes = {} }) => {
 
     svg.attr("width", dimensions.width).attr("height", dimensions.height);
 
-    // 使用墨卡托投影，并调整比例和中心点
-    // 可用的地图投影方式：
-    // - geoMercator() - 墨卡托投影，最常见的矩形投影
-    // - geoOrthographic() - 球体投影/地球仪投影
-    // - geoEquirectangular() - 简单等矩形投影（平板投影）
-    // - geoEqualEarth() - 等面积地球投影，保持区域面积比例
-    // - geoNaturalEarth1() - 自然地球投影（第1版）
-    // - geoAzimuthalEqualArea() - 方位等面积投影
-    // - geoStereographic() - 立体投影
-    // - geoAlbersUsa() - 专门用于美国地图的投影
     const projection = d3
       .geoMercator()
       .scale(dimensions.width / 3 / Math.PI)
       .translate([dimensions.width / 2.2, dimensions.height / 1.6])
-      .center([0, 0]); // 稍微向右上方调整中心点
+      .center([0, 0]);
 
     const path = d3.geoPath().projection(projection);
+
+    // Create tooltip div
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background", "#FFFFFF")
+      .style("padding", "12px")
+      .style("border-radius", "8px")
+      .style("pointer-events", "none")
+      .style("z-index", "10");
 
     // Draw countries
     const countries = feature(worldData, worldData.objects.countries);
@@ -88,59 +85,40 @@ const LeftWorldMap = ({ nodes = {} }) => {
       .append("path")
       .attr("d", path)
       .attr("fill", (d) => {
-        const countryName = d.properties.name;
-        // 特殊处理Russia的情况
-        if (countryName === "Russia") {
-          return normalizedNodes["Russia"] ? "#4460FF" : "#B7C2FF";
-        }
-        const normalizedName = COUNTRY_NAME_MAPPING[countryName] || countryName;
-        return normalizedNodes[normalizedName] ? "#4460FF" : "#B7C2FF";
+        const countryName = getCountryNameByCode(d.properties.name);
+        return normalizedNodes[countryName] ? "#4460FF" : "#B7C2FF";
       })
       .attr("stroke", "#fff")
-      .attr("stroke-width", "0.2") // 减小边界线宽度
+      .attr("stroke-width", "0.2")
       .style("cursor", "pointer")
-      .on("mouseover", (event, d) => {
-        d3.select(event.currentTarget);
-      })
-      .on("mousemove", (event, d) => {
-        const countryName = d.properties.name;
-        // 特殊处理Russia的情况
-        const displayName =
-          countryName === "Russia"
-            ? "Russia"
-            : Object.entries(COUNTRY_NAME_MAPPING).find(
-                ([k, v]) => v === countryName
-              )?.[0] || countryName;
-        const nodeCount =
-          countryName === "Russia"
-            ? normalizedNodes["Russia"]
-            : normalizedNodes[countryName] || 0;
+      .on("mouseover", function (event, d) {
+        const countryName = getCountryNameByCode(d.properties.name);
+        const nodeCount = normalizedNodes[countryName] || 0;
+        const percentage = ((nodeCount / totalNodes) * 100).toFixed(1);
 
-        setHoverInfo({
-          country: displayName,
-          nodes: nodeCount,
-        });
-        const rect = containerRef.current.getBoundingClientRect();
-        setTooltipPosition({
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top,
-        });
+        tooltip.style("visibility", "visible").html(`
+            <div style="background: #FFFFFF;">
+              <p style="margin: 0; color: #1F2937; font-size: 14px;">
+                <span style="font-weight: bold;">${countryName}</span><br/>
+                <span style="color: #2563EB;">${nodeCount}</span> nodes
+                <span style="color: #6B7280;"> (${percentage}%)</span>
+              </p>
+            </div>
+          `);
       })
-      .on("mouseout", (event, d) => {
-        const countryName = d.properties.name;
-        d3.select(event.currentTarget).attr(
-          "fill",
-          countryName === "Russia"
-            ? normalizedNodes["Russia"]
-              ? "#4460FF"
-              : "#B7C2FF"
-            : normalizedNodes[countryName]
-            ? "#4460FF"
-            : "#B7C2FF"
-        );
-        setHoverInfo({ country: "", nodes: 0 });
+      .on("mousemove", function (event) {
+        tooltip
+          .style("top", event.pageY - 10 + "px")
+          .style("left", event.pageX + 10 + "px");
+      })
+      .on("mouseout", function () {
+        tooltip.style("visibility", "hidden");
       });
-  }, [nodes, dimensions]);
+
+    return () => {
+      tooltip.remove();
+    };
+  }, [nodes, dimensions, normalizedNodes, totalNodes]);
 
   return (
     <div
@@ -175,29 +153,9 @@ const LeftWorldMap = ({ nodes = {} }) => {
             preserveAspectRatio="xMidYMid meet"
           ></svg>
         </div>
-        {hoverInfo.country && (
-          <div
-            className="absolute bg-white border border-gray-100 rounded-lg p-3 shadow-xl pointer-events-none z-10"
-            style={{
-              left: `${tooltipPosition.x}px`,
-              top: `${tooltipPosition.y}px`,
-              transform: "translate(-50%, -80%)",
-            }}
-          >
-            <p className="text-sm font-medium text-gray-800">
-              <span className="font-bold">{hoverInfo.country}</span>
-              <br />
-              <span className="text-blue-600">{hoverInfo.nodes}</span> nodes
-              <span className="text-gray-500">
-                {" "}
-                ({((hoverInfo.nodes / totalNodes) * 100).toFixed(1)}%)
-              </span>
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
 };
 
-export default LeftWorldMap;
+export default WorldMap;

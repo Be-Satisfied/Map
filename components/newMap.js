@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useEffect } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
@@ -12,7 +12,7 @@ import {
   COUNTRY_NAME_MAPPING,
 } from "@/app/utis/address";
 
-function WorldMap({ nodes = {} }) {
+function WorldMap({ nodes = {}, searchCountry }) {
   // Group nodes by regions
   const regionNodes = Object.entries(REGIONS).reduce(
     (acc, [region, countries]) => {
@@ -21,6 +21,10 @@ function WorldMap({ nodes = {} }) {
     },
     {}
   );
+
+  useEffect(() => {
+    console.log(searchCountry, "1321");
+  }, [searchCountry]);
 
   // Calculate nodes for each region
   Object.entries(nodes).forEach(([countryCode, count]) => {
@@ -32,32 +36,33 @@ function WorldMap({ nodes = {} }) {
     }
   });
 
-  const totalNodes = Object.values(regionNodes).reduce(
-    (sum, count) => sum + count,
-    0
-  );
-
   useLayoutEffect(() => {
     let root = am5.Root.new("chartdiv");
     root.setThemes([am5themes_Dark.new(root)]);
 
     let chart = root.container.children.push(
       am5map.MapChart.new(root, {
-        // 禁用鼠标滚轮缩放
-        wheelY: "none", // 将wheelY设置为none来禁用滚轮缩放
-        // 禁用鼠标拖动
+        wheelY: "none",
         panX: "none",
         panY: "none",
-        rotationX: 0, // X轴旋转角度
-        rotationZ: 0, // Z轴旋转角度
-        // projection: am5map.geoMercator(),
-        // projection: am5map.geoEquirectangular(),
-        // Natural Earth 1 天然地球 1
+        rotationX: 0,
+        rotationZ: 0,
         projection: am5map.geoNaturalEarth1(),
         maxZoomLevel: 1,
         centerMapOnZoomOut: true,
+        paddingLeft: 0,
+        paddingRight: 0,
+        paddingTop: 0,
+        paddingBottom: 0,
+        maxWidth: "100%",
+        maxHeight: "100%",
       })
     );
+
+    chart.setAll({
+      width: am5.percent(100),
+      height: am5.percent(100),
+    });
 
     let polygonSeries = chart.series.push(
       am5map.MapPolygonSeries.new(root, {
@@ -101,14 +106,9 @@ function WorldMap({ nodes = {} }) {
 
       for (const [region, countries] of Object.entries(REGIONS)) {
         if (countries.includes(countryCode)) {
-          //   console.log(region);
           const nodeCount = regionNodes[region];
           if (nodeCount > 500) {
-            if (region === "EUE") {
-              return am5.color("#4460FF");
-            } else {
-              return am5.color("#4460FF");
-            }
+            return am5.color("#4460FF");
           } else if (nodeCount > 200) {
             return am5.color("#788BFF");
           } else {
@@ -119,28 +119,21 @@ function WorldMap({ nodes = {} }) {
       return am5.color("#B7C2FF");
     });
 
-    // Show region information in tooltip
+    // Show country node information in tooltip
     polygonSeries.mapPolygons.template.adapters.add(
       "tooltipHTML",
       (text, target) => {
         const dataContext = target.dataItem.dataContext;
         const countryCode = dataContext.id;
+        const countryName = getCountryNameByCode(countryCode);
+        const nodeCount = nodes[countryCode] || 0;
 
-        for (const [region, countries] of Object.entries(REGIONS)) {
-          if (countries.includes(countryCode)) {
-            const nodeCount = regionNodes[region];
-            const percentage = ((nodeCount / totalNodes) * 100).toFixed(1);
-
-            return `<div style="background: #FFFFFF; padding: 12px; border-radius: 8px;">
-              <p style="margin: 0; color: #1F2937; font-size: 14px;">
-                <span style="font-weight: bold;">${COUNTRY_NAME_MAPPING[region]}</span><br/>
-                <span style="color: #2563EB;">${nodeCount}</span> nodes
-                <span style="color: #6B7280;"> (${percentage}%)</span>
-              </p>
-            </div>`;
-          }
-        }
-        return "";
+        return `<div style="background: #FFFFFF; padding: 12px; border-radius: 8px;">
+          <p style="margin: 0; color: #1F2937; font-size: 14px;">
+            <span style="font-weight: bold;">${countryName}</span><br/>
+            <span style="color: #2563EB;">${nodeCount}</span> nodes
+          </p>
+        </div>`;
       }
     );
 
@@ -153,10 +146,10 @@ function WorldMap({ nodes = {} }) {
 
   return (
     <div
-      className="w-full lg:w-4/5 h-full max-h-[600px] p-4 rounded-[10px] box-shadow box-border"
+      className="w-full lg:w-4/5 h-[600px] max-h-[600px] p-6 rounded-[10px] box-shadow box-border map-container"
       style={{ background: "rgba(255, 255, 255, 0.50)" }}
     >
-      <h2 className="flex flex-row border-b border-[#BABABA] pb-2 items-center gap-2 text-2xl font-semibold mb-4">
+      <h2 className="text-2xl font-semibold mb-6 border-b text-black border-[#BABABA] pb-3 flex flex-row items-center gap-3 whitespace-nowrap overflow-hidden text-ellipsis">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="32"
@@ -173,9 +166,53 @@ function WorldMap({ nodes = {} }) {
         </svg>
         Regional Node Distribution
       </h2>
-      <div id="chartdiv" style={{ width: "100%", height: "450px" }}></div>
+      <div
+        id="chartdiv"
+        className="w-full relative"
+        style={{ aspectRatio: "16/9" }}
+      >
+        {Object.entries(regionNodes).map(([region, count]) => (
+          <div
+            key={region}
+            className="chartdiv absolute flex flex-row md:flex-col items-center p-1 bg-[rgba(255,255,255,0.8)] text-black rounded-lg text-[8px] md:text-base cursor-pointer hover:bg-[rgba(255,255,255,0.9)]"
+            style={{
+              ...getRegionPosition(region),
+              zIndex: 5,
+            }}
+            onClick={(e) => {
+              document.querySelectorAll("#chartdiv > div").forEach((el) => {
+                el.style.zIndex = "5";
+              });
+              e.currentTarget.style.zIndex = "10";
+            }}
+          >
+            <div className="text-center text-sm md:text-xs font-semibold">
+              {COUNTRY_NAME_MAPPING[region]}
+            </div>
+            <div className="ml-1 text-sm md:text-xs md:ml-0 font-semibold">
+              <span className="text-[#526BFF]">{count}</span> nodes
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
+
+const getRegionPosition = (region) => {
+  const positions = {
+    AMN: { left: "10%", top: "35%" }, // North America
+    EUW: { left: "38%", top: "30%" }, // West Europe
+    EUM: { left: "49%", top: "36%" }, // Middle Europe
+    AFS: { left: "50%", top: "78%" }, // South Africa
+    EUN: { left: "50%", top: "8%" }, // North Europe
+    EUE: { left: "55%", top: "25%" }, // East Europe
+    ASW: { left: "58%", top: "52%" }, // West Asia
+    ASS: { left: "65%", top: "60%" }, // South Asia
+    ASE: { left: "75%", top: "45%" }, // South-East Asia
+    OCE: { left: "85%", top: "70%" }, // Oceania
+  };
+  return positions[region] || { left: "50%", top: "50%" };
+};
 
 export default WorldMap;

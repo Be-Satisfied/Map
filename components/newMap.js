@@ -248,15 +248,15 @@ function WorldMap({ nodes = {}, searchCountry }) {
 const getRegionPosition = (region) => {
   const positions = {
     AMN: { left: "10%", top: "35%" }, // North America
-    EUW: { left: "38%", top: "30%" }, // West Europe
+    EUW: { left: "42%", top: "30%" }, // West Europe
     EUM: { left: "49%", top: "36%" }, // Middle Europe
     AFS: { left: "50%", top: "78%" }, // South Africa
-    EUN: { left: "50%", top: "8%" }, // North Europe
+    EUN: { left: "50%", top: "12%" }, // North Europe
     EUE: { left: "55%", top: "25%" }, // East Europe
     ASW: { left: "58%", top: "52%" }, // West Asia
-    ASS: { left: "65%", top: "60%" }, // South Asia
-    SOUTH_EAST_ASIA: { left: "75%", top: "45%" }, // South-East Asia
-    OCE: { left: "85%", top: "70%" }, // Oceania
+    ASS: { left: "68%", top: "50%" }, // South Asia
+    SOUTH_EAST_ASIA: { left: "85%", top: "60%" }, // South-East Asia
+    OCE: { left: "90%", top: "70%" }, // Oceania
     EAST_ASIA: { left: "80%", top: "35%" }, // East Asia
   };
   return positions[region] || { left: "50%", top: "50%" };

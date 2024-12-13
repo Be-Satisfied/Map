@@ -245,7 +245,7 @@ function WorldMap({ nodes = {}, searchCountry }) {
     </div>
   );
 }
-
+// East Asia
 const getRegionPosition = (region) => {
   const positions = {
     AMN: { left: "10%", top: "35%" }, // North America
@@ -258,6 +258,7 @@ const getRegionPosition = (region) => {
     ASS: { left: "65%", top: "60%" }, // South Asia
     ASE: { left: "75%", top: "45%" }, // South-East Asia
     OCE: { left: "85%", top: "70%" }, // Oceania
+    EAST_ASIA: { left: "75%", top: "45%" }, // East Asia
   };
   return positions[region] || { left: "50%", top: "50%" };
 };

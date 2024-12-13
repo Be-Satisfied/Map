@@ -507,6 +507,8 @@ const REGIONS = {
     "VU",
     "WS",
   ],
+  // East Asia
+  ASE: ["CN", "HK", "JP", "KP", "KR", "MO", "MN", "TW"],
 };
 // 名称
 const COUNTRY_NAME_MAPPING = {
@@ -520,6 +522,8 @@ const COUNTRY_NAME_MAPPING = {
   ASS: "South Asia",
   ASE: "South-East Asia",
   OCE: "Oceania",
+  // East Asia
+  ASE: "East Asia",
 };
 
 // 4. 导出工具函数和常量
@@ -546,5 +550,6 @@ module.exports = {
     AFRI: ["AFN", "AFM", "AFE", "AFW", "AFS"], // 非洲
     EURO: ["EUN", "EUE", "EUW", "EUS"], // 欧洲
     OCEA: ["OCP", "OCA", "OCM", "OCN"], // 大洋洲
+    EAST_ASIA: ["ASE"], // 东亚
   },
 };

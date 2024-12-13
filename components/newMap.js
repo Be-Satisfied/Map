@@ -79,7 +79,15 @@ function WorldMap({ nodes = {}, searchCountry }) {
       paddingRight: 0,
       paddingTop: 0,
       paddingLeft: 0,
+      layer: 99999,
     });
+
+    tooltip.set(
+      "container",
+      am5.Container.new(root, {
+        zIndex: 99999,
+      })
+    );
 
     tooltip.get("background").setAll({
       fill: am5.color("#FFFFFF"),
@@ -87,12 +95,15 @@ function WorldMap({ nodes = {}, searchCountry }) {
       stroke: am5.color("#FFFFFF"),
       strokeOpacity: 1,
       cornerRadius: 8,
+      zIndex: 99999,
     });
 
     polygonSeries.mapPolygons.template.setAll({
       interactive: true,
       tooltipPosition: "pointer",
       tooltip: tooltip,
+      zIndex: 10,
+      tooltipY: 0,
     });
 
     polygonSeries.mapPolygons.template.states.create("hover", {
@@ -127,8 +138,11 @@ function WorldMap({ nodes = {}, searchCountry }) {
         const countryCode = dataContext.id;
         const countryName = getCountryNameByCode(countryCode);
         const nodeCount = nodes[countryCode] || 0;
+        if (nodeCount === 0) {
+          return "";
+        }
 
-        return `<div style="background: #FFFFFF; padding: 12px; border-radius: 8px;">
+        return `<div style="background: #FFFFFF; padding: 12px; border-radius: 8px; z-index: 99999; position: relative;">
           <p style="margin: 0; color: #1F2937; font-size: 14px;">
             <span style="font-weight: bold;">${countryName}</span><br/>
             <span style="color: #2563EB;">${nodeCount}</span> nodes
@@ -164,9 +178,11 @@ function WorldMap({ nodes = {}, searchCountry }) {
             strokeWidth="0.20424"
           />
         </svg>
-        Regional Node Distribution
+        <span className="flex-shrink-0 flex-grow-0 text-black">
+          Regional Node Distribution
+        </span>
       </h2>
-      <div
+      {/* <div
         id="chartdiv"
         className="w-full relative"
         style={{ aspectRatio: "16/9" }}
@@ -177,13 +193,13 @@ function WorldMap({ nodes = {}, searchCountry }) {
             className="chartdiv absolute flex flex-row md:flex-col items-center p-1 bg-[rgba(255,255,255,0.8)] text-black rounded-lg text-[8px] md:text-base cursor-pointer hover:bg-[rgba(255,255,255,0.9)]"
             style={{
               ...getRegionPosition(region),
-              zIndex: 5,
+              zIndex: 1,
             }}
             onClick={(e) => {
               document.querySelectorAll("#chartdiv > div").forEach((el) => {
-                el.style.zIndex = "5";
+                el.style.zIndex = "1";
               });
-              e.currentTarget.style.zIndex = "10";
+              e.currentTarget.style.zIndex = "2";
             }}
           >
             <div className="text-center text-sm md:text-xs font-semibold">
@@ -194,6 +210,37 @@ function WorldMap({ nodes = {}, searchCountry }) {
             </div>
           </div>
         ))}
+      </div> */}
+      <div className="w-full relative" style={{ aspectRatio: "16/9" }}>
+        {/* 地图容器 */}
+        <div id="chartdiv" className="w-full h-full absolute top-0 left-0" />
+
+        {/* 标签容器 */}
+        <div className="w-full h-full absolute top-0 left-0 pointer-events-none">
+          {Object.entries(regionNodes).map(([region, count]) => (
+            <div
+              key={region}
+              className="absolute flex flex-row md:flex-col items-center p-1 bg-[rgba(255,255,255,0.8)] text-black rounded-lg text-[8px] md:text-base pointer-events-auto cursor-pointer hover:bg-[rgba(255,255,255,0.9)]"
+              style={{
+                ...getRegionPosition(region),
+                zIndex: 20, // 确保标签始终在地图上层
+              }}
+              onClick={(e) => {
+                document.querySelectorAll(".region-label").forEach((el) => {
+                  el.style.zIndex = "20";
+                });
+                e.currentTarget.style.zIndex = "21";
+              }}
+            >
+              <div className="text-center text-sm md:text-xs font-semibold">
+                {COUNTRY_NAME_MAPPING[region]}
+              </div>
+              <div className="ml-1 text-sm md:text-xs md:ml-0 font-semibold">
+                <span className="text-[#526BFF]">{count}</span> nodes
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

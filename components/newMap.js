@@ -220,10 +220,10 @@ function WorldMap({ nodes = {}, searchCountry }) {
           {Object.entries(regionNodes).map(([region, count]) => (
             <div
               key={region}
-              className="absolute flex flex-row md:flex-col items-center p-1 bg-[rgba(255,255,255,0.8)] text-black rounded-lg text-[8px] md:text-base pointer-events-auto cursor-pointer hover:bg-[rgba(255,255,255,0.9)]"
+              className="absolute flex flex-row md:flex-col items-center p-0.5 bg-[rgba(255,255,255,0.8)] text-black rounded text-[6px] md:text-sm pointer-events-auto cursor-pointer hover:bg-[rgba(255,255,255,0.9)]"
               style={{
                 ...getRegionPosition(region),
-                zIndex: 20, // 确保标签始终在地图上层
+                zIndex: 20,
               }}
               onClick={(e) => {
                 document.querySelectorAll(".region-label").forEach((el) => {
@@ -232,10 +232,10 @@ function WorldMap({ nodes = {}, searchCountry }) {
                 e.currentTarget.style.zIndex = "21";
               }}
             >
-              <div className="text-center text-sm md:text-xs font-semibold">
+              <div className="text-center text-xs md:text-[10px] font-medium">
                 {COUNTRY_NAME_MAPPING[region]}
               </div>
-              <div className="ml-1 text-sm md:text-xs md:ml-0 font-semibold">
+              <div className="ml-0.5 text-xs md:text-[10px] md:ml-0 font-medium">
                 <span className="text-[#526BFF]">{count}</span> nodes
               </div>
             </div>
@@ -245,7 +245,6 @@ function WorldMap({ nodes = {}, searchCountry }) {
     </div>
   );
 }
-// East Asia
 const getRegionPosition = (region) => {
   const positions = {
     AMN: { left: "10%", top: "35%" }, // North America
@@ -256,9 +255,9 @@ const getRegionPosition = (region) => {
     EUE: { left: "55%", top: "25%" }, // East Europe
     ASW: { left: "58%", top: "52%" }, // West Asia
     ASS: { left: "65%", top: "60%" }, // South Asia
-    ASE: { left: "75%", top: "45%" }, // South-East Asia
+    SOUTH_EAST_ASIA: { left: "75%", top: "45%" }, // South-East Asia
     OCE: { left: "85%", top: "70%" }, // Oceania
-    EAST_ASIA: { left: "75%", top: "45%" }, // East Asia
+    EAST_ASIA: { left: "80%", top: "35%" }, // East Asia
   };
   return positions[region] || { left: "50%", top: "50%" };
 };

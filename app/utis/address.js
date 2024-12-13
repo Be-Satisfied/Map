@@ -486,10 +486,6 @@ const REGIONS = {
   ],
   // South Asia
   ASS: ["AF", "BD", "BT", "IN", "IR", "LK", "MV", "NP", "PK"],
-  // South-East Asia
-  ASE: ["BN", "KH", "ID", "LA", "MY", "MM", "PH", "SG", "TH", "TL", "VN"],
-  // East Asia
-  ASE: ["CN", "HK", "JP", "KP", "KR", "MO", "MN", "TW"],
   // Oceania
   OCE: [
     "AU",
@@ -508,7 +504,21 @@ const REGIONS = {
     "WS",
   ],
   // East Asia
-  ASE: ["CN", "HK", "JP", "KP", "KR", "MO", "MN", "TW"],
+  EAST_ASIA: ["CN", "HK", "JP", "KP", "KR", "MO", "MN", "TW"],
+  // South-East Asia
+  SOUTH_EAST_ASIA: [
+    "BN",
+    "KH",
+    "ID",
+    "LA",
+    "MY",
+    "MM",
+    "PH",
+    "SG",
+    "TH",
+    "TL",
+    "VN",
+  ],
 };
 // 名称
 const COUNTRY_NAME_MAPPING = {
@@ -520,10 +530,11 @@ const COUNTRY_NAME_MAPPING = {
   EUE: "East Europe",
   ASW: "West Asia",
   ASS: "South Asia",
-  ASE: "South-East Asia",
   OCE: "Oceania",
   // East Asia
-  ASE: "East Asia",
+  EAST_ASIA: "East Asia",
+  // East Asia South-East Asia
+  SOUTH_EAST_ASIA: "South-East Asia",
 };
 
 // 4. 导出工具函数和常量
@@ -550,6 +561,7 @@ module.exports = {
     AFRI: ["AFN", "AFM", "AFE", "AFW", "AFS"], // 非洲
     EURO: ["EUN", "EUE", "EUW", "EUS"], // 欧洲
     OCEA: ["OCP", "OCA", "OCM", "OCN"], // 大洋洲
-    EAST_ASIA: ["ASE"], // 东亚
+    EAST_ASIA: ["EAST_ASIA"], // 东亚
+    SOUTH_EAST_ASIA: ["SOUTH_EAST_ASIA"], // 南亚
   },
 };

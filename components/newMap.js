@@ -110,22 +110,18 @@ function WorldMap({ nodes = {}, searchCountry }) {
       fill: am5.color("#FFFFFF"),
     });
 
-    // Color countries based on their region's node count
+    // Color countries based on their node count
     polygonSeries.mapPolygons.template.adapters.add("fill", (fill, target) => {
       const dataContext = target.dataItem.dataContext;
       const countryCode = dataContext.id;
+      const nodeCount = nodes[countryCode] || 0;
 
-      for (const [region, countries] of Object.entries(REGIONS)) {
-        if (countries.includes(countryCode)) {
-          const nodeCount = regionNodes[region];
-          if (nodeCount > 500) {
-            return am5.color("#4460FF");
-          } else if (nodeCount > 200) {
-            return am5.color("#788BFF");
-          } else {
-            return am5.color("#B7C2FF");
-          }
-        }
+      if (nodeCount > 500) {
+        return am5.color("#4460FF");
+      } else if (nodeCount > 200) {
+        return am5.color("#788BFF");
+      } else if (nodeCount > 0) {
+        return am5.color("#B7C2FF");
       }
       return am5.color("#B7C2FF");
     });
